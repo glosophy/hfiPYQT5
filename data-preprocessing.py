@@ -14,3 +14,6 @@ print(hfi.dtypes)
 hfi = hfi.replace('-', np.nan)
 hfi = hfi.replace(' ', np.nan)
 hfi.iloc[:,4:] = hfi.iloc[:,4:].apply(pd.to_numeric)
+
+#Save csv
+hfi.to_csv(cwd + '/hfi2019CC.csv')
