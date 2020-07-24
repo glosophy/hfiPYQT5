@@ -57,6 +57,8 @@ class MainWindow(QMainWindow):
         toolbar.addWidget(QCheckBox())
         toolbar.addWidget(QLabel("Checkbox 2"))
         toolbar.addWidget(QCheckBox())
+        toolbar.addWidget(QLabel("Checkbox 3"))
+        toolbar.addWidget(QCheckBox())
 
         self.setStatusBar(QStatusBar(self))
 
