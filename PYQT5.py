@@ -3,72 +3,44 @@
 # https://github.com/amir-jafari/Data-Mining/tree/master/Demo/PyQt5/Tutorial
 # https://www.learnpyqt.com/
 # ::--------------------------------------------------------------------------------------
-
 import sys
 import pandas as pd
-import numpy as np
-from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QApplication, QToolBar, QStatusBar
-from PyQt5.QtWidgets import QCheckBox  #Checkbox
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtCore import Qt, QSize  # Control status
-from PyQt5.QtWidgets import  QWidget,QLabel, QVBoxLayout, QHBoxLayout, QGridLayout
+from PyQt5.QtWidgets import QApplication, QTableView
+from PyQt5.QtCore import QAbstractTableModel, Qt
 
 # ::--------------------------------------------------------------------------------------
 # App
 # ::--------------------------------------------------------------------------------------
 
-# Subclass QMainWindow to customise the app's main window
-class MainWindow(QMainWindow):
+df = pd.read_csv('hfi2019CC.csv')
 
-    def __init__(self, *args, **kwargs):
-        super(MainWindow, self).__init__(*args, **kwargs)
+class pandasModel(QAbstractTableModel):
+    def __init__(self, data):
+        QAbstractTableModel.__init__(self)
+        self._data = data
 
-        self.setWindowTitle("My Awesome App")
+    def rowCount(self, parent=None):
+        return self._data.shape[0]
 
-        label = QLabel("THIS IS AWESOME!!!")
-        label.setAlignment(Qt.AlignCenter)
+    def columnCount(self, parent=None):
+        return self._data.shape[1]
 
-        self.setCentralWidget(label)
+    def data(self, index, role=Qt.DisplayRole):
+        if index.isValid():
+            if role == Qt.DisplayRole:
+                return str(self._data.iloc[index.row(), index.column()])
+        return None
 
-        toolbar = QToolBar("My main toolbar")
-        toolbar.setIconSize(QSize(16, 16))
-        self.addToolBar(toolbar)
+    def headerData(self, col, orientation, role):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self._data.columns[col]
+        return None
 
-        button_action = QAction(QIcon("animal-penguin.png"), "Your button", self)
-        button_action.setStatusTip("This is your button")
-        button_action.triggered.connect(self.onMyToolBarButtonClick)
-        button_action.setCheckable(True)
-        toolbar.addAction(button_action)
-
-        toolbar.addSeparator()
-
-        button_action2 = QAction(QIcon("animal-penguin.png"), "Your button2", self)
-        button_action2.setStatusTip("This is your button2")
-        button_action2.triggered.connect(self.onMyToolBarButtonClick)
-        button_action2.setCheckable(True)
-        toolbar.addAction(button_action2)
-
-        toolbar.addSeparator()
-
-        toolbar.addWidget(QLabel("Checkbox 1"))
-        toolbar.addWidget(QCheckBox())
-        toolbar.addWidget(QLabel("Checkbox 2"))
-        toolbar.addWidget(QCheckBox())
-        toolbar.addWidget(QLabel("Checkbox 3"))
-        toolbar.addWidget(QCheckBox())
-
-        self.setStatusBar(QStatusBar(self))
-
-    def onMyToolBarButtonClick(self, s):
-        print("click", s)
-
-app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show()
-
-# Start the event loop
-app.exec_()
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    model = pandasModel(df)
+    view = QTableView()
+    view.setModel(model)
+    view.resize(800, 600)
+    view.show()
+    sys.exit(app.exec_())
